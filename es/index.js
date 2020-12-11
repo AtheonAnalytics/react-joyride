@@ -2275,7 +2275,8 @@ var JoyrideStep = /*#__PURE__*/function (_React$Component) {
       var _this$props3 = _this.props,
           action = _this$props3.action,
           setPopper = _this$props3.setPopper,
-          update = _this$props3.update;
+          update = _this$props3.update,
+          step = _this$props3.step;
 
       if (type === 'wrapper') {
         _this.beaconPopper = popper;
@@ -2290,6 +2291,10 @@ var JoyrideStep = /*#__PURE__*/function (_React$Component) {
           action: action === ACTIONS.CLOSE ? ACTIONS.CLOSE : action,
           lifecycle: LIFECYCLE.READY
         });
+      }
+
+      if (step && step.floaterProps && step.floaterProps.getPopper) {
+        step.floaterProps.getPopper(popper, type);
       }
     });
 
@@ -2475,13 +2480,14 @@ var JoyrideStep = /*#__PURE__*/function (_React$Component) {
           step: step
         }),
         debug: debug,
-        getPopper: this.setPopper,
         id: "react-joyride-step-".concat(index),
         isPositioned: step.isFixed || hasPosition(target),
         open: this.open,
         placement: step.placement,
         target: step.target
-      }, step.floaterProps), /*#__PURE__*/React.createElement(JoyrideBeacon, {
+      }, step.floaterProps, {
+        getPopper: this.setPopper
+      }), /*#__PURE__*/React.createElement(JoyrideBeacon, {
         beaconComponent: step.beaconComponent,
         locale: step.locale,
         onClickOrHover: this.handleClickHoverBeacon,
