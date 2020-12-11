@@ -130,6 +130,19 @@ function _setPrototypeOf(o, p) {
   return _setPrototypeOf(o, p);
 }
 
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 function _objectWithoutPropertiesLoose(source, excluded) {
   if (source == null) return {};
   var target = {};
@@ -180,6 +193,25 @@ function _possibleConstructorReturn(self, call) {
   }
 
   return _assertThisInitialized(self);
+}
+
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived),
+        result;
+
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+
+    return _possibleConstructorReturn(this, result);
+  };
 }
 
 var ACTIONS = {
@@ -355,7 +387,7 @@ function hideBeacon(step) {
 
 function isEqual(left, right) {
   var type;
-  var hasReactElement = isValidElement(left) || isValidElement(right);
+  var hasReactElement = /*#__PURE__*/isValidElement(left) || /*#__PURE__*/isValidElement(right);
   var hasUndefined = is.undefined(left) || is.undefined(right);
 
   if (getObjectType(left) !== getObjectType(right) || hasReactElement || hasUndefined) {
@@ -477,9 +509,7 @@ function createStore(props) {
   var store = new Map();
   var data = new Map();
 
-  var Store =
-  /*#__PURE__*/
-  function () {
+  var Store = /*#__PURE__*/function () {
     function Store() {
       var _this = this;
 
@@ -521,7 +551,7 @@ function createStore(props) {
           throw new Error("State is not valid. Valid keys: ".concat(validKeys.join(', ')));
         }
 
-        _this.setState(_objectSpread2({}, _this.getNextState(_objectSpread2({}, _this.getState(), {}, state, {
+        _this.setState(_objectSpread2({}, _this.getNextState(_objectSpread2(_objectSpread2(_objectSpread2({}, _this.getState()), state), {}, {
           action: state.action || ACTIONS.UPDATE
         }), true)));
       });
@@ -531,10 +561,10 @@ function createStore(props) {
             index = _this$getState2.index,
             size = _this$getState2.size;
 
-        _this.setState(_objectSpread2({}, _this.getNextState({
+        _this.setState(_objectSpread2(_objectSpread2({}, _this.getNextState({
           action: ACTIONS.START,
           index: is.number(nextIndex) ? nextIndex : index
-        }, true), {
+        }, true)), {}, {
           status: size ? STATUS.RUNNING : STATUS.WAITING
         }));
       });
@@ -548,10 +578,10 @@ function createStore(props) {
 
         if ([STATUS.FINISHED, STATUS.SKIPPED].indexOf(status) !== -1) return;
 
-        _this.setState(_objectSpread2({}, _this.getNextState({
+        _this.setState(_objectSpread2(_objectSpread2({}, _this.getNextState({
           action: ACTIONS.STOP,
           index: index + (advance ? 1 : 0)
-        }), {
+        })), {}, {
           status: STATUS.PAUSED
         }));
       });
@@ -578,10 +608,10 @@ function createStore(props) {
 
         var step = _this.getSteps()[nextIndex];
 
-        _this.setState(_objectSpread2({}, _this.getNextState({
+        _this.setState(_objectSpread2(_objectSpread2({}, _this.getNextState({
           action: ACTIONS.GO,
           index: nextIndex
-        }), {
+        })), {}, {
           status: step ? status : STATUS.FINISHED
         }));
       });
@@ -636,10 +666,10 @@ function createStore(props) {
 
         if (controlled) return;
 
-        _this.setState(_objectSpread2({}, _this.getNextState({
+        _this.setState(_objectSpread2(_objectSpread2({}, _this.getNextState({
           action: ACTIONS.RESET,
           index: 0
-        }), {
+        })), {}, {
           status: restart ? STATUS.RUNNING : STATUS.READY
         }));
       });
@@ -674,7 +704,7 @@ function createStore(props) {
         var initial = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
         var state = this.getState();
 
-        var _state$nextState = _objectSpread2({}, state, {}, nextState),
+        var _state$nextState = _objectSpread2(_objectSpread2({}, state), nextState),
             action = _state$nextState.action,
             index = _state$nextState.index,
             lifecycle = _state$nextState.lifecycle,
@@ -1071,12 +1101,12 @@ var componentTypeWithRefs = createChainableTypeChecker(function (props, propName
   var propValue = props[propName];
   var Component = propValue;
 
-  if (!React.isValidElement(propValue) && isValidElementType(propValue)) {
+  if (! /*#__PURE__*/React.isValidElement(propValue) && isValidElementType(propValue)) {
     var ownProps = {
       ref: function ref() {},
       step: {}
     };
-    Component = React.createElement(Component, ownProps);
+    Component = /*#__PURE__*/React.createElement(Component, ownProps);
   }
 
   if (is.string(propValue) || is.number(propValue) || !isValidElementType(propValue) || !([Element, ForwardRef].indexOf(typeOf(Component)) !== -1)) {
@@ -1138,7 +1168,7 @@ function getStyles() {
     zIndex: options.zIndex
   };
   var defaultStyles = {
-    beacon: _objectSpread2({}, buttonBase, {
+    beacon: _objectSpread2(_objectSpread2({}, buttonBase), {}, {
       display: 'inline-block',
       height: options.beaconSize,
       position: 'relative',
@@ -1204,17 +1234,17 @@ function getStyles() {
     tooltipFooterSpacer: {
       flex: 1
     },
-    buttonNext: _objectSpread2({}, buttonBase, {
+    buttonNext: _objectSpread2(_objectSpread2({}, buttonBase), {}, {
       backgroundColor: options.primaryColor,
       borderRadius: 4,
       color: '#fff'
     }),
-    buttonBack: _objectSpread2({}, buttonBase, {
+    buttonBack: _objectSpread2(_objectSpread2({}, buttonBase), {}, {
       color: options.primaryColor,
       marginLeft: 'auto',
       marginRight: 5
     }),
-    buttonClose: _objectSpread2({}, buttonBase, {
+    buttonClose: _objectSpread2(_objectSpread2({}, buttonBase), {}, {
       color: options.textColor,
       height: 14,
       padding: 15,
@@ -1223,22 +1253,22 @@ function getStyles() {
       top: 0,
       width: 14
     }),
-    buttonSkip: _objectSpread2({}, buttonBase, {
+    buttonSkip: _objectSpread2(_objectSpread2({}, buttonBase), {}, {
       color: options.textColor,
       fontSize: 14
     }),
-    overlay: _objectSpread2({}, overlay, {
+    overlay: _objectSpread2(_objectSpread2({}, overlay), {}, {
       backgroundColor: options.overlayColor,
       mixBlendMode: 'hard-light'
     }),
     overlayLegacy: _objectSpread2({}, overlay),
-    overlayLegacyCenter: _objectSpread2({}, overlay, {
+    overlayLegacyCenter: _objectSpread2(_objectSpread2({}, overlay), {}, {
       backgroundColor: options.overlayColor
     }),
-    spotlight: _objectSpread2({}, spotlight, {
+    spotlight: _objectSpread2(_objectSpread2({}, spotlight), {}, {
       backgroundColor: 'gray'
     }),
-    spotlightLegacy: _objectSpread2({}, spotlight, {
+    spotlightLegacy: _objectSpread2(_objectSpread2({}, spotlight), {}, {
       boxShadow: "0 0 0 9999px ".concat(options.overlayColor, ", ").concat(options.spotlightShadow)
     }),
     floaterStyles: {
@@ -1304,7 +1334,7 @@ function getMergedStep(step, props) {
   floaterProps.offset = mergedStep.offset;
   floaterProps.styles = deepmerge(floaterProps.styles || {}, mergedStyles.floaterStyles || {});
   delete mergedStyles.floaterStyles;
-  floaterProps.offset += props.spotlightPadding || step.spotlightPadding;
+  floaterProps.offset += props.spotlightPadding || step.spotlightPadding || 0;
 
   if (step.placementBeacon) {
     floaterProps.wrapperOptions.placement = step.placementBeacon;
@@ -1314,7 +1344,7 @@ function getMergedStep(step, props) {
     floaterProps.options.preventOverflow.boundariesElement = 'window';
   }
 
-  return _objectSpread2({}, mergedStep, {
+  return _objectSpread2(_objectSpread2({}, mergedStep), {}, {
     locale: deepmerge.all([DEFAULTS.locale, props.locale || {}, mergedStep.locale || {}]),
     floaterProps: floaterProps,
     styles: mergedStyles
@@ -1396,13 +1426,13 @@ var Scope = function Scope(_element) {
     var tabIndex = element.tabIndex;
     if (tabIndex === null || tabIndex < 0) tabIndex = undefined;
     var isTabIndexNaN = isNaN(tabIndex);
-    return !isTabIndexNaN && _this.canHaveFocus(element, true);
+    return !isTabIndexNaN && _this.canHaveFocus(element);
   });
 
-  _defineProperty(this, "canHaveFocus", function (element, isTabIndexNotNaN) {
+  _defineProperty(this, "canHaveFocus", function (element) {
     var validTabNodes = /input|select|textarea|button|object/;
     var nodeName = element.nodeName.toLowerCase();
-    var res = validTabNodes.test(nodeName) && !element.getAttribute('disabled') || (nodeName === 'a' ? element.getAttribute('href') || isTabIndexNotNaN : isTabIndexNotNaN);
+    var res = validTabNodes.test(nodeName) && !element.getAttribute('disabled') || nodeName === 'a' && !!element.getAttribute('href');
     return res && _this.isVisible(element);
   });
 
@@ -1506,17 +1536,17 @@ var Scope = function Scope(_element) {
   this.setFocus();
 };
 
-var JoyrideBeacon =
-/*#__PURE__*/
-function (_React$Component) {
+var JoyrideBeacon = /*#__PURE__*/function (_React$Component) {
   _inherits(JoyrideBeacon, _React$Component);
+
+  var _super = _createSuper(JoyrideBeacon);
 
   function JoyrideBeacon(props) {
     var _this;
 
     _classCallCheck(this, JoyrideBeacon);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(JoyrideBeacon).call(this, props));
+    _this = _super.call(this, props);
 
     _defineProperty(_assertThisInitialized(_this), "setBeaconRef", function (c) {
       _this.beacon = c;
@@ -1576,16 +1606,16 @@ function (_React$Component) {
 
       if (beaconComponent) {
         var BeaconComponent = beaconComponent;
-        component = React.createElement(BeaconComponent, props);
+        component = /*#__PURE__*/React.createElement(BeaconComponent, props);
       } else {
-        component = React.createElement("button", _extends({
+        component = /*#__PURE__*/React.createElement("button", _extends({
           key: "JoyrideBeacon",
           className: "react-joyride__beacon",
           style: styles.beacon,
           type: "button"
-        }, props), React.createElement("span", {
+        }, props), /*#__PURE__*/React.createElement("span", {
           style: styles.beaconInner
-        }), React.createElement("span", {
+        }), /*#__PURE__*/React.createElement("span", {
           style: styles.beaconOuter
         }));
       }
@@ -1599,21 +1629,19 @@ function (_React$Component) {
 
 var JoyrideSpotlight = function JoyrideSpotlight(_ref) {
   var styles = _ref.styles;
-  return React.createElement("div", {
+  return /*#__PURE__*/React.createElement("div", {
     key: "JoyrideSpotlight",
     className: "react-joyride__spotlight",
     style: styles
   });
 };
 
-var JoyrideOverlay =
-/*#__PURE__*/
-function (_React$Component) {
+var JoyrideOverlay = /*#__PURE__*/function (_React$Component) {
   _inherits(JoyrideOverlay, _React$Component);
 
-  function JoyrideOverlay() {
-    var _getPrototypeOf2;
+  var _super = _createSuper(JoyrideOverlay);
 
+  function JoyrideOverlay() {
     var _this;
 
     _classCallCheck(this, JoyrideOverlay);
@@ -1622,7 +1650,7 @@ function (_React$Component) {
       args[_key] = arguments[_key];
     }
 
-    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(JoyrideOverlay)).call.apply(_getPrototypeOf2, [this].concat(args)));
+    _this = _super.call.apply(_super, [this].concat(args));
 
     _defineProperty(_assertThisInitialized(_this), "_isMounted", false);
 
@@ -1795,7 +1823,7 @@ function (_React$Component) {
         pointerEvents: mouseOverSpotlight ? 'none' : 'auto'
       }, baseStyles);
 
-      var spotlight = placement !== 'center' && showSpotlight && React.createElement(JoyrideSpotlight, {
+      var spotlight = placement !== 'center' && showSpotlight && /*#__PURE__*/React.createElement(JoyrideSpotlight, {
         styles: this.spotlightStyles
       }); // Hack for Safari bug with mix-blend-mode with z-index
 
@@ -1804,13 +1832,13 @@ function (_React$Component) {
             zIndex = stylesOverlay.zIndex,
             safarOverlay = _objectWithoutProperties(stylesOverlay, ["mixBlendMode", "zIndex"]);
 
-        spotlight = React.createElement("div", {
+        spotlight = /*#__PURE__*/React.createElement("div", {
           style: _objectSpread2({}, safarOverlay)
         }, spotlight);
         delete stylesOverlay.backgroundColor;
       }
 
-      return React.createElement("div", {
+      return /*#__PURE__*/React.createElement("div", {
         className: "react-joyride__overlay",
         style: stylesOverlay,
         onClick: onClickOverlay
@@ -1830,7 +1858,7 @@ function (_React$Component) {
       var elementRect = getClientRect(element);
       var isFixedTarget = hasPosition(element);
       var top = getElementPosition(element, spotlightPadding, disableScrollParentFix);
-      return _objectSpread2({}, isLegacy() ? styles.spotlightLegacy : styles.spotlight, {
+      return _objectSpread2(_objectSpread2({}, isLegacy() ? styles.spotlightLegacy : styles.spotlight), {}, {
         height: Math.round(elementRect.height + spotlightPadding * 2),
         left: Math.round(elementRect.left - spotlightPadding),
         opacity: showSpotlight ? 1 : 0,
@@ -1855,31 +1883,31 @@ var JoyrideTooltipCloseBtn = function JoyrideTooltipCloseBtn(_ref) {
       width = styles.width,
       style = _objectWithoutProperties(styles, ["color", "height", "width"]);
 
-  return React.createElement("button", _extends({
+  return /*#__PURE__*/React.createElement("button", _extends({
     style: style,
     type: "button"
-  }, props), React.createElement("svg", {
+  }, props), /*#__PURE__*/React.createElement("svg", {
     width: typeof width === 'number' ? "".concat(width, "px") : width,
     height: typeof height === 'number' ? "".concat(height, "px") : height,
     viewBox: "0 0 18 18",
     version: "1.1",
     xmlns: "http://www.w3.org/2000/svg",
     preserveAspectRatio: "xMidYMid"
-  }, React.createElement("g", null, React.createElement("path", {
+  }, /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
     d: "M8.13911129,9.00268191 L0.171521827,17.0258467 C-0.0498027049,17.248715 -0.0498027049,17.6098394 0.171521827,17.8327545 C0.28204354,17.9443526 0.427188206,17.9998706 0.572051765,17.9998706 C0.71714958,17.9998706 0.862013139,17.9443526 0.972581703,17.8327545 L9.0000937,9.74924618 L17.0276057,17.8327545 C17.1384085,17.9443526 17.2832721,17.9998706 17.4281356,17.9998706 C17.5729992,17.9998706 17.718097,17.9443526 17.8286656,17.8327545 C18.0499901,17.6098862 18.0499901,17.2487618 17.8286656,17.0258467 L9.86135722,9.00268191 L17.8340066,0.973848225 C18.0553311,0.750979934 18.0553311,0.389855532 17.8340066,0.16694039 C17.6126821,-0.0556467968 17.254037,-0.0556467968 17.0329467,0.16694039 L9.00042166,8.25611765 L0.967006424,0.167268345 C0.745681892,-0.0553188426 0.387317931,-0.0553188426 0.165993399,0.167268345 C-0.0553311331,0.390136635 -0.0553311331,0.751261038 0.165993399,0.974176179 L8.13920499,9.00268191 L8.13911129,9.00268191 Z",
     fill: color
   }))));
 };
 
-var JoyrideTooltipContainer =
-/*#__PURE__*/
-function (_React$Component) {
+var JoyrideTooltipContainer = /*#__PURE__*/function (_React$Component) {
   _inherits(JoyrideTooltipContainer, _React$Component);
+
+  var _super = _createSuper(JoyrideTooltipContainer);
 
   function JoyrideTooltipContainer() {
     _classCallCheck(this, JoyrideTooltipContainer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(JoyrideTooltipContainer).apply(this, arguments));
+    return _super.apply(this, arguments);
   }
 
   _createClass(JoyrideTooltipContainer, [{
@@ -1918,12 +1946,12 @@ function (_React$Component) {
         output.primary = isLastStep ? last : next;
 
         if (showProgress) {
-          output.primary = React.createElement("span", null, output.primary, " (", index + 1, "/", size, ")");
+          output.primary = /*#__PURE__*/React.createElement("span", null, output.primary, " (", index + 1, "/", size, ")");
         }
       }
 
       if (showSkipButton && !isLastStep) {
-        output.skip = React.createElement("button", _extends({
+        output.skip = /*#__PURE__*/React.createElement("button", _extends({
           style: styles.buttonSkip,
           type: "button",
           "aria-live": "off"
@@ -1931,31 +1959,31 @@ function (_React$Component) {
       }
 
       if (!hideBackButton && index > 0) {
-        output.back = React.createElement("button", _extends({
+        output.back = /*#__PURE__*/React.createElement("button", _extends({
           style: styles.buttonBack,
           type: "button"
         }, backProps), back);
       }
 
-      output.close = !hideCloseButton && React.createElement(JoyrideTooltipCloseBtn, _extends({
+      output.close = !hideCloseButton && /*#__PURE__*/React.createElement(JoyrideTooltipCloseBtn, _extends({
         styles: styles.buttonClose
       }, closeProps));
-      return React.createElement("div", _extends({
+      return /*#__PURE__*/React.createElement("div", _extends({
         key: "JoyrideTooltip",
         className: "react-joyride__tooltip",
         style: styles.tooltip
-      }, tooltipProps), React.createElement("div", {
+      }, tooltipProps), /*#__PURE__*/React.createElement("div", {
         style: styles.tooltipContainer
-      }, title && React.createElement("h4", {
+      }, title && /*#__PURE__*/React.createElement("h4", {
         style: styles.tooltipTitle,
         "aria-label": title
-      }, title), React.createElement("div", {
+      }, title), /*#__PURE__*/React.createElement("div", {
         style: styles.tooltipContent
-      }, content)), !hideFooter && React.createElement("div", {
+      }, content)), !hideFooter && /*#__PURE__*/React.createElement("div", {
         style: styles.tooltipFooter
-      }, React.createElement("div", {
+      }, /*#__PURE__*/React.createElement("div", {
         style: styles.tooltipFooterSpacer
-      }, output.skip), output.back, React.createElement("button", _extends({
+      }, output.skip), output.back, /*#__PURE__*/React.createElement("button", _extends({
         style: styles.buttonNext,
         type: "button"
       }, primaryProps), output.primary)), output.close);
@@ -1965,14 +1993,12 @@ function (_React$Component) {
   return JoyrideTooltipContainer;
 }(React.Component);
 
-var JoyrideTooltip =
-/*#__PURE__*/
-function (_React$Component) {
+var JoyrideTooltip = /*#__PURE__*/function (_React$Component) {
   _inherits(JoyrideTooltip, _React$Component);
 
-  function JoyrideTooltip() {
-    var _getPrototypeOf2;
+  var _super = _createSuper(JoyrideTooltip);
 
+  function JoyrideTooltip() {
     var _this;
 
     _classCallCheck(this, JoyrideTooltip);
@@ -1981,7 +2007,7 @@ function (_React$Component) {
       args[_key] = arguments[_key];
     }
 
-    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(JoyrideTooltip)).call.apply(_getPrototypeOf2, [this].concat(args)));
+    _this = _super.call.apply(_super, [this].concat(args));
 
     _defineProperty(_assertThisInitialized(_this), "handleClickBack", function (e) {
       e.preventDefault();
@@ -2089,7 +2115,7 @@ function (_React$Component) {
       var component;
 
       if (tooltipComponent) {
-        var renderProps = _objectSpread2({}, this.getElementsProps(), {
+        var renderProps = _objectSpread2(_objectSpread2({}, this.getElementsProps()), {}, {
           continuous: continuous,
           index: index,
           isLastStep: isLastStep,
@@ -2098,9 +2124,9 @@ function (_React$Component) {
         });
 
         var TooltipComponent = tooltipComponent;
-        component = React.createElement(TooltipComponent, renderProps);
+        component = /*#__PURE__*/React.createElement(TooltipComponent, renderProps);
       } else {
-        component = React.createElement(JoyrideTooltipContainer, _extends({}, this.getElementsProps(), {
+        component = /*#__PURE__*/React.createElement(JoyrideTooltipContainer, _extends({}, this.getElementsProps(), {
           continuous: continuous,
           index: index,
           isLastStep: isLastStep,
@@ -2116,17 +2142,17 @@ function (_React$Component) {
   return JoyrideTooltip;
 }(React.Component);
 
-var JoyridePortal =
-/*#__PURE__*/
-function (_React$Component) {
+var JoyridePortal = /*#__PURE__*/function (_React$Component) {
   _inherits(JoyridePortal, _React$Component);
+
+  var _super = _createSuper(JoyridePortal);
 
   function JoyridePortal(props) {
     var _this;
 
     _classCallCheck(this, JoyridePortal);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(JoyridePortal).call(this, props));
+    _this = _super.call(this, props);
     if (!canUseDOM) return _possibleConstructorReturn(_this);
     _this.node = document.createElement('div');
     /* istanbul ignore else */
@@ -2181,7 +2207,7 @@ function (_React$Component) {
     value: function renderReact16() {
       if (!canUseDOM || !isReact16) return null;
       var children = this.props.children;
-      return ReactDOM.createPortal(children, this.node);
+      return /*#__PURE__*/ReactDOM.createPortal(children, this.node);
     }
   }, {
     key: "render",
@@ -2197,14 +2223,12 @@ function (_React$Component) {
   return JoyridePortal;
 }(React.Component);
 
-var JoyrideStep =
-/*#__PURE__*/
-function (_React$Component) {
+var JoyrideStep = /*#__PURE__*/function (_React$Component) {
   _inherits(JoyrideStep, _React$Component);
 
-  function JoyrideStep() {
-    var _getPrototypeOf2;
+  var _super = _createSuper(JoyrideStep);
 
+  function JoyrideStep() {
     var _this;
 
     _classCallCheck(this, JoyrideStep);
@@ -2213,7 +2237,7 @@ function (_React$Component) {
       args[_key] = arguments[_key];
     }
 
-    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(JoyrideStep)).call.apply(_getPrototypeOf2, [this].concat(args)));
+    _this = _super.call.apply(_super, [this].concat(args));
 
     _defineProperty(_assertThisInitialized(_this), "scope", {
       removeScope: function removeScope() {}
@@ -2322,7 +2346,7 @@ function (_React$Component) {
       var isAfterAction = changedTo('action', [ACTIONS.NEXT, ACTIONS.PREV, ACTIONS.SKIP, ACTIONS.CLOSE]);
 
       if (isAfterAction && (hasStarted || controlled)) {
-        callback(_objectSpread2({}, state, {
+        callback(_objectSpread2(_objectSpread2({}, state), {}, {
           index: prevProps.index,
           lifecycle: LIFECYCLE.COMPLETE,
           step: prevProps.step,
@@ -2338,7 +2362,7 @@ function (_React$Component) {
 
         if (hasRenderedTarget) {
           if (changedFrom('status', STATUS.READY, STATUS.RUNNING) || changedFrom('lifecycle', LIFECYCLE.INIT, LIFECYCLE.READY)) {
-            callback(_objectSpread2({}, state, {
+            callback(_objectSpread2(_objectSpread2({}, state), {}, {
               step: step,
               type: EVENTS.STEP_BEFORE
             }));
@@ -2346,7 +2370,7 @@ function (_React$Component) {
         } else {
           console.warn(elementExists ? 'Target not visible' : 'Target not mounted', step); //eslint-disable-line no-console
 
-          callback(_objectSpread2({}, state, {
+          callback(_objectSpread2(_objectSpread2({}, state), {}, {
             type: EVENTS.TARGET_NOT_FOUND,
             step: step
           }));
@@ -2379,14 +2403,14 @@ function (_React$Component) {
 
 
       if (changedTo('lifecycle', LIFECYCLE.BEACON)) {
-        callback(_objectSpread2({}, state, {
+        callback(_objectSpread2(_objectSpread2({}, state), {}, {
           step: step,
           type: EVENTS.BEACON
         }));
       }
 
       if (changedTo('lifecycle', LIFECYCLE.TOOLTIP)) {
-        callback(_objectSpread2({}, state, {
+        callback(_objectSpread2(_objectSpread2({}, state), {}, {
           step: step,
           type: EVENTS.TOOLTIP
         }));
@@ -2431,17 +2455,17 @@ function (_React$Component) {
         return null;
       }
 
-      return React.createElement("div", {
+      return /*#__PURE__*/React.createElement("div", {
         key: "JoyrideStep-".concat(index),
         className: "react-joyride__step"
-      }, React.createElement(JoyridePortal, {
+      }, /*#__PURE__*/React.createElement(JoyridePortal, {
         id: "react-joyride-portal"
-      }, React.createElement(JoyrideOverlay, _extends({}, step, {
+      }, /*#__PURE__*/React.createElement(JoyrideOverlay, _extends({}, step, {
         debug: debug,
         lifecycle: lifecycle,
         onClickOverlay: this.handleClickOverlay
-      }))), React.createElement(Floater, _extends({
-        component: React.createElement(JoyrideTooltip, {
+      }))), /*#__PURE__*/React.createElement(Floater, _extends({
+        component: /*#__PURE__*/React.createElement(JoyrideTooltip, {
           continuous: continuous,
           helpers: helpers,
           index: index,
@@ -2457,7 +2481,7 @@ function (_React$Component) {
         open: this.open,
         placement: step.placement,
         target: step.target
-      }, step.floaterProps), React.createElement(JoyrideBeacon, {
+      }, step.floaterProps), /*#__PURE__*/React.createElement(JoyrideBeacon, {
         beaconComponent: step.beaconComponent,
         locale: step.locale,
         onClickOrHover: this.handleClickHoverBeacon,
@@ -2478,17 +2502,17 @@ function (_React$Component) {
   return JoyrideStep;
 }(React.Component);
 
-var Joyride =
-/*#__PURE__*/
-function (_React$Component) {
+var Joyride = /*#__PURE__*/function (_React$Component) {
   _inherits(Joyride, _React$Component);
+
+  var _super = _createSuper(Joyride);
 
   function Joyride(props) {
     var _this;
 
     _classCallCheck(this, Joyride);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Joyride).call(this, props));
+    _this = _super.call(this, props);
 
     _defineProperty(_assertThisInitialized(_this), "initStore", function () {
       var _this$props = _this.props,
@@ -2496,7 +2520,7 @@ function (_React$Component) {
           getHelpers = _this$props.getHelpers,
           run = _this$props.run,
           stepIndex = _this$props.stepIndex;
-      _this.store = new createStore(_objectSpread2({}, _this.props, {
+      _this.store = new createStore(_objectSpread2(_objectSpread2({}, _this.props), {}, {
         controlled: run && is.number(stepIndex)
       }));
       _this.helpers = _this.store.getHelpers();
@@ -2658,7 +2682,7 @@ function (_React$Component) {
         }
       }
 
-      var callbackData = _objectSpread2({}, this.state, {
+      var callbackData = _objectSpread2(_objectSpread2({}, this.state), {}, {
         index: index,
         step: step
       });
@@ -2667,7 +2691,7 @@ function (_React$Component) {
 
       if (isAfterAction && changedTo('status', STATUS.PAUSED)) {
         var prevStep = getMergedStep(steps[prevState.index], this.props);
-        this.callback(_objectSpread2({}, callbackData, {
+        this.callback(_objectSpread2(_objectSpread2({}, callbackData), {}, {
           index: prevState.index,
           lifecycle: LIFECYCLE.COMPLETE,
           step: prevStep,
@@ -2679,7 +2703,7 @@ function (_React$Component) {
         var _prevStep = getMergedStep(steps[prevState.index], this.props);
 
         if (!controlled) {
-          this.callback(_objectSpread2({}, callbackData, {
+          this.callback(_objectSpread2(_objectSpread2({}, callbackData), {}, {
             index: prevState.index,
             lifecycle: LIFECYCLE.COMPLETE,
             step: _prevStep,
@@ -2687,7 +2711,7 @@ function (_React$Component) {
           }));
         }
 
-        this.callback(_objectSpread2({}, callbackData, {
+        this.callback(_objectSpread2(_objectSpread2({}, callbackData), {}, {
           type: EVENTS.TOUR_END,
           // Return the last step when the tour is finished
           step: _prevStep,
@@ -2695,15 +2719,15 @@ function (_React$Component) {
         }));
         reset();
       } else if (changedFrom('status', [STATUS.IDLE, STATUS.READY], STATUS.RUNNING)) {
-        this.callback(_objectSpread2({}, callbackData, {
+        this.callback(_objectSpread2(_objectSpread2({}, callbackData), {}, {
           type: EVENTS.TOUR_START
         }));
       } else if (changed('status')) {
-        this.callback(_objectSpread2({}, callbackData, {
+        this.callback(_objectSpread2(_objectSpread2({}, callbackData), {}, {
           type: EVENTS.TOUR_STATUS
         }));
       } else if (changedTo('action', ACTIONS.RESET)) {
-        this.callback(_objectSpread2({}, callbackData, {
+        this.callback(_objectSpread2(_objectSpread2({}, callbackData), {}, {
           type: EVENTS.TOUR_STATUS
         }));
       }
@@ -2825,7 +2849,7 @@ function (_React$Component) {
       var output;
 
       if (status === STATUS.RUNNING && step) {
-        output = React.createElement(JoyrideStep, _extends({}, this.state, {
+        output = /*#__PURE__*/React.createElement(JoyrideStep, _extends({}, this.state, {
           callback: this.callback,
           continuous: continuous,
           debug: debug,
@@ -2837,7 +2861,7 @@ function (_React$Component) {
         }));
       }
 
-      return React.createElement("div", {
+      return /*#__PURE__*/React.createElement("div", {
         className: "react-joyride"
       }, output);
     }
