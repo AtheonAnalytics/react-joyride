@@ -104,11 +104,12 @@ class Joyride extends React.Component {
     const { steps: prevSteps, stepIndex: prevStepIndex } = prevProps;
     const { setSteps, reset, start, stop, update } = this.store;
     const { changed: changedProps } = treeChanges(prevProps, this.props);
-    const { changed, changedFrom, changedTo } = treeChanges(prevState, this.state);
+    const { changed, changedFrom } = treeChanges(prevState, this.state);
     const step = getMergedStep(steps[index], this.props);
 
     const stepsChanged = !isEqual(prevSteps, steps);
     const stepIndexChanged = is.number(stepIndex) && changedProps('stepIndex');
+    const target = getElement(step?.target);
 
     if (stepsChanged) {
       if (validateSteps(steps, debug)) {
@@ -144,19 +145,29 @@ class Joyride extends React.Component {
       }
     }
 
+    // Update the index if the first step is not found
+    if (!controlled && status === STATUS.RUNNING && index === 0 && !target) {
+      this.store.update({ index: index + 1 });
+      this.callback({
+        ...this.state,
+        type: EVENTS.TARGET_NOT_FOUND,
+        step,
+      });
+    }
+
     const callbackData = {
       ...this.state,
       index,
       step,
     };
-    const isAfterAction = changedTo('action', [
+    const isAfterAction = changed('action', [
       ACTIONS.NEXT,
       ACTIONS.PREV,
       ACTIONS.SKIP,
       ACTIONS.CLOSE,
     ]);
 
-    if (isAfterAction && changedTo('status', STATUS.PAUSED)) {
+    if (isAfterAction && changed('status', STATUS.PAUSED)) {
       const prevStep = getMergedStep(steps[prevState.index], this.props);
 
       this.callback({
@@ -168,7 +179,7 @@ class Joyride extends React.Component {
       });
     }
 
-    if (changedTo('status', [STATUS.FINISHED, STATUS.SKIPPED])) {
+    if (changed('status', [STATUS.FINISHED, STATUS.SKIPPED])) {
       const prevStep = getMergedStep(steps[prevState.index], this.props);
 
       if (!controlled) {
@@ -198,7 +209,7 @@ class Joyride extends React.Component {
         ...callbackData,
         type: EVENTS.TOUR_STATUS,
       });
-    } else if (changedTo('action', ACTIONS.RESET)) {
+    } else if (changed('action', ACTIONS.RESET)) {
       this.callback({
         ...callbackData,
         type: EVENTS.TOUR_STATUS,

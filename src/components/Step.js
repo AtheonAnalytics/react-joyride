@@ -104,7 +104,7 @@ export default class JoyrideStep extends React.Component {
       step,
       update,
     } = this.props;
-    const { changed, changedTo, changedFrom } = treeChanges(prevProps, this.props);
+    const { changed, changedFrom } = treeChanges(prevProps, this.props);
     const state = { action, controlled, index, lifecycle, size, status };
 
     const skipBeacon =
@@ -116,7 +116,7 @@ export default class JoyrideStep extends React.Component {
       [LIFECYCLE.TOOLTIP, LIFECYCLE.INIT],
       LIFECYCLE.INIT,
     );
-    const isAfterAction = changedTo('action', [
+    const isAfterAction = changed('action', [
       ACTIONS.NEXT,
       ACTIONS.PREV,
       ACTIONS.SKIP,
@@ -177,7 +177,7 @@ export default class JoyrideStep extends React.Component {
     }
 
     /* istanbul ignore else */
-    if (changedTo('lifecycle', LIFECYCLE.BEACON)) {
+    if (changed('lifecycle', LIFECYCLE.BEACON)) {
       callback({
         ...state,
         step,
@@ -185,7 +185,7 @@ export default class JoyrideStep extends React.Component {
       });
     }
 
-    if (changedTo('lifecycle', LIFECYCLE.TOOLTIP)) {
+    if (changed('lifecycle', LIFECYCLE.TOOLTIP)) {
       callback({
         ...state,
         step,

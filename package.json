@@ -1,6 +1,6 @@
 {
   "name": "react-joyride",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Create guided tours for your apps",
   "author": "Gil Barbara <gilbarbara@gmail.com>",
   "repository": {
@@ -43,7 +43,7 @@
     "react-is": "^16.13.1",
     "scroll": "^3.0.1",
     "scrollparent": "^2.0.1",
-    "tree-changes": "^0.5.1"
+    "tree-changes": "^0.6.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
